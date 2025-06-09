@@ -1,9 +1,6 @@
 import { useState } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
 import { useAuth } from '../Auth/AuthProvider';
 import styles from './ReportForm.module.css';
-import { Issue } from '../types';
 
 
 export interface FoodEvent {
@@ -63,7 +60,6 @@ export default function ReportForm({ location, onSubmit, onCancel, existingEvent
   const [endHour, setEndHour] = useState(endParts.hour);
   const [endMinute, setEndMinute] = useState(endParts.minute);
   const [endAmPm, setEndAmPm] = useState(endParts.ampm);
-  const [selectedFoodTypes, setSelectedFoodTypes] = useState<string[]>(existingEvent?.category || []);
   const [isFree, setIsFree] = useState(existingEvent?.isFree ?? true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,14 +104,6 @@ export default function ReportForm({ location, onSubmit, onCancel, existingEvent
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const toggleFoodType = (type: string) => {
-    setSelectedFoodTypes(prev => 
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
-    );
   };
 
   const toggleCategory = (cat: string) => {

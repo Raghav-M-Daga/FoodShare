@@ -2,21 +2,15 @@
 
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import ReactDOM from 'react-dom/client';
-import { Issue } from '../types';
-import { useAuth } from '../Auth/AuthProvider';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './Map.module.css';
+import { Issue } from '../types';
+import { useAuth } from '../Auth/AuthProvider';
 
 interface Props {
   issues: Issue[];
   onMapClick: (location: { lng: number; lat: number; x: number; y: number }) => void;
   pendingLocation: { lng: number; lat: number } | null;
-  onDeletePin?: (pinId: string, userId: string) => void;
-  renderReportForm: (
-    location: { lng: number; lat: number },
-    existingIssue?: Issue | null
-  ) => React.ReactNode;
   onPinClick?: (eventId: string) => void;
   selectedPinId?: string | null;
   isEditing?: boolean;
@@ -29,8 +23,6 @@ export default function Map({
   issues,
   onMapClick,
   pendingLocation,
-  onDeletePin,
-  renderReportForm,
   onPinClick,
   selectedPinId,
   isEditing = false,
@@ -44,16 +36,6 @@ export default function Map({
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const reportPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-
-  const closePopup = () => {
-    reportPopupRef.current?.remove();
-    reportPopupRef.current = null;
-  };
-  const closeOtherPopups = useCallback((current: mapboxgl.Marker) => {
-    markersRef.current.forEach(m => {
-      if (m !== current) m.getPopup()?.remove();
-    });
-  }, []);
 
   // Map click handler
   const handleMapClick = useCallback(

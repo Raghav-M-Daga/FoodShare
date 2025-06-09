@@ -596,8 +596,6 @@ export default function MapPage() {
             issues={filteredMapPins}
             pendingLocation={pendingLocation}
             onMapClick={handleMapClick}
-            onDeletePin={handleDeletePin}
-            renderReportForm={() => null}
             onPinClick={handlePinClick}
             selectedPinId={selectedPinId}
             isEditing={isEditing}

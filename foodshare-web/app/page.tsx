@@ -34,7 +34,6 @@ export default function HomePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userPins, setUserPins] = useState<Pin[]>([]);
-  const [isLoadingPins, setIsLoadingPins] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -44,7 +43,7 @@ export default function HomePage() {
 
   const loadUserPins = async () => {
     if (!user) return;
-    setIsLoadingPins(true);
+    setIsLoading(true);
     try {
       const pinsRef = collection(db, 'pins');
       const q = query(pinsRef, where('userId', '==', user.uid));
@@ -67,7 +66,7 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error loading pins:', error);
     } finally {
-      setIsLoadingPins(false);
+      setIsLoading(false);
     }
   };
 
@@ -118,20 +117,6 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error saving user:', error);
     }
-  };
-
-  const handleDeletePin = async (pinId: string) => {
-    if (!user) return;
-    try {
-      await deleteDoc(doc(db, 'pins', pinId));
-      await loadUserPins();
-    } catch (error) {
-      console.error('Error deleting pin:', error);
-    }
-  };
-
-  const handleEditPin = (pin: Pin) => {
-    router.push(`/map?edit=${pin.id}`);
   };
 
   return (

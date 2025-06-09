@@ -25,16 +25,16 @@ export default function AuthForm({ defaultMode = 'signin' }: AuthFormProps) {
       } else {
         await registerWithEmail(email, password);
       }
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Authentication failed');
     }
   };
 
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
-    } catch (err: any) {
-      setError(err.message || 'Google sign in failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Google sign in failed');
     }
   };
 
@@ -121,7 +121,7 @@ export default function AuthForm({ defaultMode = 'signin' }: AuthFormProps) {
         <div className={styles.footer}>
           {isSignIn ? (
             <p>
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <button 
                 className={styles.footerLink}
                 onClick={() => setIsSignIn(false)}
