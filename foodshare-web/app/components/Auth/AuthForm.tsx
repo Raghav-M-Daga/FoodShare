@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import styles from './Auth.module.css';
-import { useAuth } from '../../AuthProvider';
+import { useAuth } from '../Auth/AuthProvider';
 
 interface AuthFormProps {
   defaultMode?: 'signin' | 'signup';
