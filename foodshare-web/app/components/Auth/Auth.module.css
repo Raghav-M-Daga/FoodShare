@@ -1,0 +1,153 @@
+.authContainer {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #6949FF 0%, #4A90E2 100%);
+  padding: 20px;
+}
+
+.authCard {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 480px;
+}
+
+.authHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+.input {
+  padding: 12px 16px;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6949FF;
+  box-shadow: 0 0 0 2px rgba(105, 73, 255, 0.1);
+}
+
+.button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.primaryButton {
+  composes: button;
+  background: #6949FF;
+  color: white;
+}
+
+.primaryButton:hover {
+  background: #5B3CE3;
+}
+
+.secondaryButton {
+  composes: button;
+  background: white;
+  color: #1A1A1A;
+  border: 1px solid #E5E5E5;
+}
+
+.secondaryButton:hover {
+  background: #F5F5F5;
+}
+
+.googleButton {
+  composes: secondaryButton;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.googleIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #E5E5E5;
+}
+
+.dividerText {
+  font-size: 14px;
+  color: #666;
+}
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.footerLink {
+  color: #6949FF;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,46 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background: #fff;
+  color: #111;
+}
+
+.mapboxgl-canvas {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Custom popup styling */
+.custom-popup .mapboxgl-popup-content {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.custom-popup .mapboxgl-popup-tip {
+  display: none;
+}
+
+/* Hide the default popup close button */
+.custom-popup .mapboxgl-popup-close-button {
+  display: none;
+}
+
+/* Ensure the popup container is centered */
+.custom-popup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-marker {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+body, button, input, textarea, select {
+  font-family: 'Inter', 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
