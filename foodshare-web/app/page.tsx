@@ -3,9 +3,11 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./components/Auth/AuthProvider";
-import { doc, setDoc, collection, query, where, getDocs, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import styles from "./HomePage.module.css";
+import Image from "next/image";
+import type { User } from 'firebase/auth';
 
 interface Pin {
   id: string;
@@ -33,13 +35,6 @@ export default function HomePage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userPins, setUserPins] = useState<Pin[]>([]);
-
-  useEffect(() => {
-    if (user) {
-      loadUserPins();
-    }
-  }, [user]);
 
   const loadUserPins = async () => {
     if (!user) return;
@@ -62,13 +57,18 @@ export default function HomePage() {
         };
         pins.push(pin);
       });
-      setUserPins(pins);
-    } catch (error) {
-      console.error('Error loading pins:', error);
+    } catch (error: unknown) {
+      handleAuthError(error as Error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadUserPins();
+    }
+  }, [user, loadUserPins]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -76,8 +76,8 @@ export default function HomePage() {
     try {
       const userCredential = await loginWithGoogle();
       await saveUserToFirestore(userCredential.user);
-    } catch (error: any) {
-      handleAuthError(error);
+    } catch (error: unknown) {
+      handleAuthError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -93,19 +93,19 @@ export default function HomePage() {
         ? await registerWithEmail(email, password)
         : await loginWithEmail(email, password);
       await saveUserToFirestore(userCredential.user);
-    } catch (error: any) {
-      handleAuthError(error);
+    } catch (error: unknown) {
+      handleAuthError(error as Error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAuthError = (error: any) => {
+  const handleAuthError = (error: unknown) => {
     console.error('Auth error:', error);
-    setError(error.message || 'Authentication failed. Please try again.');
+    setError((error as Error).message || 'Authentication failed. Please try again.');
   };
 
-  const saveUserToFirestore = async (user: any) => {
+  const saveUserToFirestore = async (user: User) => {
     if (!user) return;
     try {
       await setDoc(doc(db, 'users', user.uid), {
@@ -114,8 +114,8 @@ export default function HomePage() {
         photoURL: user.photoURL,
         lastLogin: new Date(),
       }, { merge: true });
-    } catch (error) {
-      console.error('Error saving user:', error);
+    } catch (error: unknown) {
+      handleAuthError(error as Error);
     }
   };
 
@@ -130,7 +130,7 @@ export default function HomePage() {
         >
           <div className={styles.authHeader}>
             <div className={styles.logoWrapper}>
-              <img src="/tasty.png" alt="FoodShare" className={styles.logo} />
+              <Image src="/tasty.png" alt="FoodShare" className={styles.logo} width={120} height={40} />
             </div>
             <h1 className={styles.heroTitle}>{isRegistering ? 'Join FoodShare' : 'Welcome Back!'}</h1>
           </div>
@@ -177,10 +177,12 @@ export default function HomePage() {
                     onClick={handleGoogleLogin}
                     disabled={isLoading || authLoading || !isInitialized}
                   >
-                    <img 
+                    <Image 
                       src="/google-logo.png" 
                       alt="Continue with Google"
                       className={styles.googleLogo}
+                      width={20}
+                      height={20}
                     />
                     {isLoading || authLoading ? 'Signing in...' : 'Continue with Google'}
                   </button>

@@ -34,7 +34,6 @@ export default function Map({
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const reportPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Map click handler

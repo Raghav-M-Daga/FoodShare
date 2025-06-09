@@ -11,7 +11,7 @@ import { Issue } from '../components/types';
 import styles from './MapPage.module.css';
 import { Home } from 'lucide-react';
 import { FoodEvent } from '../components/ReportForm/ReportForm';
-import { differenceInMinutes, isAfter, isBefore, parseISO, format, parse } from 'date-fns';
+import { isAfter, isBefore, parseISO, format, parse } from 'date-fns';
 
 const Map = dynamic(() => import('../components/Map/Map'), { ssr: false });
 
@@ -27,7 +27,6 @@ export default function MapPage() {
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
-  const [filterHost, setFilterHost] = useState('');
   const [filterCategory, setFilterCategory] = useState<string[]>([]);
   const [filterToday, setFilterToday] = useState(false);
   const [filterStartHour, setFilterStartHour] = useState('');
@@ -118,7 +117,7 @@ export default function MapPage() {
     });
 
     return () => unsubscribe();
-  }, [db]);
+  }, []);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -306,10 +305,6 @@ export default function MapPage() {
     return 0;
   });
 
-  // Get unique hosts and categories for filter dropdowns
-  const allHosts = useMemo(() => Array.from(new Set(sidebarIssues.map(e => e.host).filter(Boolean))), [sidebarIssues]);
-  const allCategories = useMemo(() => Array.from(new Set(sidebarIssues.map(e => e.category).filter(Boolean))), [sidebarIssues]);
-
   // Update applyFilters to use 12-hour format with AM/PM
   const to24Hour = (hour: string, ampm: string) => {
     if (!hour) return '';
@@ -344,7 +339,7 @@ export default function MapPage() {
     : applyFilters(sortedSidebarIssues.filter(isUpcomingEvent));
 
   // Filter pins for the map (only upcoming events, filtered)
-  const filteredMapPins = useMemo(() => applyFilters(issues.filter(isUpcomingEvent)), [issues, filterCategory, filterToday, filterStartHour, filterEndHour]);
+  const filteredMapPins = useMemo(() => applyFilters(issues.filter(isUpcomingEvent)), [issues, filterCategory, filterToday, filterStartHour, filterEndHour, applyFilters]);
 
   // Handler for map background clicks
   const handleMapBackgroundClick = () => {
