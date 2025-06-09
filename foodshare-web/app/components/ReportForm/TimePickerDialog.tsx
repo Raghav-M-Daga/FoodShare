@@ -13,7 +13,7 @@ const ampmOptions = ['AM', 'PM'];
 
 function to12Hour(val: string) {
   if (!val) return { hour: '12', minute: '00', ampm: 'AM' };
-  let [h, m] = val.split(':');
+  const [h, m] = val.split(':');
   const hour = parseInt(h, 10);
   const ampm = hour >= 12 ? 'PM' : 'AM';
   let hour12 = hour % 12;
