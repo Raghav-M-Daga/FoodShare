@@ -14,11 +14,11 @@ const ampmOptions = ['AM', 'PM'];
 function to12Hour(val: string) {
   if (!val) return { hour: '12', minute: '00', ampm: 'AM' };
   let [h, m] = val.split(':');
-  let hour = parseInt(h, 10);
-  let ampm = hour >= 12 ? 'PM' : 'AM';
-  hour = hour % 12;
-  if (hour === 0) hour = 12;
-  return { hour: hour.toString(), minute: m, ampm };
+  const hour = parseInt(h, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  let hour12 = hour % 12;
+  if (hour12 === 0) hour12 = 12;
+  return { hour: hour12.toString(), minute: m, ampm };
 }
 
 function to24Hour(hour: string, minute: string, ampm: string) {
