@@ -141,7 +141,7 @@ export default function MapPage() {
         });
       }
     })();
-  }, [db, user]);
+  }, [user]);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -157,7 +157,7 @@ export default function MapPage() {
       setBookmarkedIds(bookmarks);
     });
     return () => unsubscribe();
-  }, [db, user]);
+  }, [user]);
 
   // Load filters from Firestore on mount
   useEffect(() => {
@@ -179,7 +179,7 @@ export default function MapPage() {
         setTempEndAmPm(data.filters.filterEndAmPm || 'PM');
       }
     });
-  }, [db, user]);
+  }, [user]);
 
   // Save filters to Firestore on change
   useEffect(() => {
@@ -193,7 +193,7 @@ export default function MapPage() {
         filterEndHour
       }
     }, { merge: true });
-  }, [db, user, filterCategory, filterToday, filterStartHour, filterEndHour]);
+  }, [user, filterCategory, filterToday, filterStartHour, filterEndHour]);
 
   const handleMapClick = async (location: { lng: number; lat: number }) => {
     console.log('Map Page - Click Handler - Auth State:', {
@@ -339,7 +339,7 @@ export default function MapPage() {
     : applyFilters(sortedSidebarIssues.filter(isUpcomingEvent));
 
   // Filter pins for the map (only upcoming events, filtered)
-  const filteredMapPins = useMemo(() => applyFilters(issues.filter(isUpcomingEvent)), [issues, filterCategory, filterToday, filterStartHour, filterEndHour, applyFilters]);
+  const filteredMapPins = useMemo(() => applyFilters(issues.filter(isUpcomingEvent)), [issues]);
 
   // Handler for map background clicks
   const handleMapBackgroundClick = () => {
