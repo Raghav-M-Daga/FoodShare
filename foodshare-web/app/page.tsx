@@ -76,6 +76,7 @@ export default function HomePage() {
     try {
       const userCredential = await loginWithGoogle();
       await saveUserToFirestore(userCredential.user);
+      router.push('/campuses');
     } catch (error: unknown) {
       handleAuthError(error as Error);
     } finally {
@@ -93,6 +94,7 @@ export default function HomePage() {
         ? await registerWithEmail(email, password)
         : await loginWithEmail(email, password);
       await saveUserToFirestore(userCredential.user);
+      router.push('/campuses');
     } catch (error: unknown) {
       handleAuthError(error as Error);
     } finally {
@@ -156,7 +158,7 @@ export default function HomePage() {
                   className={styles.heroButton}
                   onClick={() => router.push("/map")}
                 >
-                  Go to Map
+                  Find Food!
                 </button>
                 <button
                   className={`${styles.heroButton} ${styles.logoutButton}`}

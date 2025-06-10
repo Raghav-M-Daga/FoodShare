@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, addDoc, getDoc, deleteDoc, updateDoc, doc, onSnapshot, arrayUnion, query, getDocs, arrayRemove, setDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useAuth } from '../components/Auth/AuthProvider';
@@ -14,6 +14,38 @@ import { FoodEvent } from '../components/ReportForm/ReportForm';
 import { isAfter, isBefore, parseISO, format, parse } from 'date-fns';
 
 const Map = dynamic(() => import('../components/Map/Map'), { ssr: false });
+
+interface Campus {
+  id: string;
+  name: string;
+  bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  };
+  center: {
+    lat: number;
+    lng: number;
+  };
+}
+
+const CAMPUSES: Record<string, Campus> = {
+  duke: {
+    id: 'duke',
+    name: 'Duke University',
+    bounds: {
+      north: 36.0135,
+      south: 36.0000,
+      east: -78.9300,
+      west: -78.9500
+    },
+    center: {
+      lat: 36.00160553451508,
+      lng: -78.93957298090419
+    }
+  }
+};
 
 export default function MapPage() {
   const router = useRouter();
@@ -41,6 +73,9 @@ export default function MapPage() {
   const [editingEvent, setEditingEvent] = useState<FoodEvent | null>(null);
   const foodTypes = ['mains', 'drinks', 'desserts'];
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const campusId = searchParams.get('campus');
+  const [currentCampus, setCurrentCampus] = useState<Campus | null>(null);
 
   useEffect(() => {
     console.log('Map Page - Auth State:', {
@@ -62,12 +97,25 @@ export default function MapPage() {
   }, [user, router, isInitialized, authLoading]);
 
   useEffect(() => {
+    if (!campusId || !CAMPUSES[campusId]) {
+      router.replace('/campuses');
+      return;
+    }
+    setCurrentCampus(CAMPUSES[campusId]);
+  }, [campusId, router]);
+
+  useEffect(() => {
     if (!db) {
       console.error('Firestore not initialized');
       return;
     }
 
-    console.log('Setting up Firestore pins listener...');
+    if (!currentCampus) {
+      console.log('Waiting for campus selection...');
+      return;
+    }
+
+    console.log('Setting up Firestore pins listener for campus:', currentCampus.id);
     const pinsCollection = collection(db, 'pins');
     const unsubscribe = onSnapshot(pinsCollection, (snapshot) => {
       console.log('Received pin update from Firestore');
@@ -76,6 +124,10 @@ export default function MapPage() {
         
         if (!data.location || typeof data.location.lng !== 'number' || typeof data.location.lat !== 'number') {
           console.error('Invalid pin location data:', data.location);
+          return null;
+        }
+
+        if (data.campusId !== currentCampus.id) {
           return null;
         }
         
@@ -96,14 +148,9 @@ export default function MapPage() {
           createdAt: data.createdAt || new Date().toISOString(),
           category: data.category || '',
           upvotes: typeof data.upvotes === 'number' ? data.upvotes : 0,
-          votedUserIds: Array.isArray(data.votedUserIds) ? data.votedUserIds : []
+          votedUserIds: Array.isArray(data.votedUserIds) ? data.votedUserIds : [],
+          campusId: data.campusId
         } as Issue;
-
-        console.log('Processed pin data:', {
-          id: processedPin.id,
-          title: processedPin.title,
-          location: processedPin.location
-        });
 
         return processedPin;
       }).filter(pin => pin !== null) as Issue[];
@@ -117,7 +164,7 @@ export default function MapPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentCampus]);
 
   useEffect(() => {
     if (!db || !user) return;
@@ -211,8 +258,8 @@ export default function MapPage() {
   };
 
   const handleNewEvent = async (event: FoodEvent) => {
-    if (!user || !db) {
-      console.error('Cannot add pin: user or db not available');
+    if (!user || !db || !currentCampus) {
+      console.error('Cannot add pin: user, db, or campus not available');
       return;
     }
 
@@ -226,7 +273,8 @@ export default function MapPage() {
         startTime: event.startTime,
         endTime: event.endTime,
         category: event.category,
-        userId: user.uid 
+        userId: user.uid,
+        campusId: currentCampus.id
       });
 
       const pinData = {
@@ -242,11 +290,11 @@ export default function MapPage() {
         userId: user.uid,
         createdAt: new Date().toISOString(),
         upvotes: 0,
-        votedUserIds: []
+        votedUserIds: [],
+        campusId: currentCampus.id
       };
 
       await addDoc(collection(db, 'pins'), pinData);
-      // Do NOT update local state here; let Firestore listener handle it
       setSelectedLocation(null);
       setPendingLocation(null);
     } catch (error) {
@@ -496,9 +544,14 @@ export default function MapPage() {
 
   return (
     <main className={styles.main}>
-      <button onClick={() => router.push('/')} className={styles.homeButton}>
+      <button onClick={() => router.push('/campuses')} className={styles.homeButton}>
         <Home size={20} />
       </button>
+      {currentCampus && (
+        <div className={styles.campusHeader}>
+          <h1>{currentCampus.name}</h1>
+        </div>
+      )}
       {/* Filter Bar at top center */}
       <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 1001, background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px #0002', padding: 12, display: 'flex', gap: 12, alignItems: 'center', fontFamily: "'Inter', 'Roboto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" }}>
         {/* Food type multi-select buttons */}
@@ -597,6 +650,8 @@ export default function MapPage() {
             editingEventId={editingEvent?.id || null}
             onPinDragEnd={handlePinDragEnd}
             onMapBackgroundClick={handleMapBackgroundClick}
+            campusBounds={currentCampus?.bounds}
+            campusCenter={currentCampus?.center}
           />
         </div>
         {/* Sidebar overlayed on the left, flush with map */}

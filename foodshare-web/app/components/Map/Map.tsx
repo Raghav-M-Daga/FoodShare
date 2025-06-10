@@ -17,6 +17,16 @@ interface Props {
   editingEventId?: string | null;
   onPinDragEnd?: (eventId: string, lngLat: { lng: number; lat: number }) => void;
   onMapBackgroundClick?: () => void;
+  campusBounds?: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  };
+  campusCenter?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export default function Map({
@@ -28,7 +38,9 @@ export default function Map({
   isEditing = false,
   editingEventId = null,
   onPinDragEnd,
-  onMapBackgroundClick
+  onMapBackgroundClick,
+  campusBounds,
+  campusCenter
 }: Props) {
   const { user, isInitialized } = useAuth();
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -42,11 +54,25 @@ export default function Map({
       if (!mapContainer.current || !user || !isInitialized) return;
       const target = e.originalEvent.target as HTMLElement;
       if (!target.classList.contains('mapboxgl-canvas')) return;
+
+      // Check if click is within campus bounds
+      if (campusBounds) {
+        const { lng, lat } = e.lngLat;
+        if (
+          lng < campusBounds.west ||
+          lng > campusBounds.east ||
+          lat < campusBounds.south ||
+          lat > campusBounds.north
+        ) {
+          return;
+        }
+      }
+
       const { left, top } = mapContainer.current.getBoundingClientRect();
       onMapClick({ lng: e.lngLat.lng, lat: e.lngLat.lat, x: e.originalEvent.clientX - left, y: e.originalEvent.clientY - top });
       if (onMapBackgroundClick) onMapBackgroundClick();
     },
-    [onMapClick, user, isInitialized, onMapBackgroundClick]
+    [onMapClick, user, isInitialized, onMapBackgroundClick, campusBounds]
   );
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) {
@@ -60,8 +86,12 @@ export default function Map({
     mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/satellite-streets-v12',
-      center: [-78.93957298090419, 36.00160553451508],
-      zoom: 15
+      center: campusCenter ? [campusCenter.lng, campusCenter.lat] : [-78.93957298090419, 36.00160553451508],
+      zoom: 15,
+      maxBounds: campusBounds ? [
+        [campusBounds.west, campusBounds.south],
+        [campusBounds.east, campusBounds.north]
+      ] : undefined
     });
 
     mapRef.current.on('load', () => {
@@ -73,7 +103,7 @@ export default function Map({
       mapRef.current = null;
       setMapLoaded(false);
     };
-  }, []);
+  }, [campusBounds, campusCenter]);
 
   // Render existing issues (pins)
   useEffect(() => {
@@ -91,7 +121,7 @@ export default function Map({
       // Color logic
       let pinColor = '#6949FF'; // default purple
       let shadowColor = 'rgba(20,184,166,0.4)';
-      if (isEditingPin) {
+      if (isEditingPin || pendingLocation) {
         pinColor = '#14b8a6'; // teal for editing/creating
         shadowColor = 'rgba(20,184,166,0.5)';
       }
@@ -133,14 +163,14 @@ export default function Map({
       const el = document.createElement('div');
       el.className = styles.marker;
       el.innerHTML = `
-        <svg width="56" height="70" viewBox="0 0 36 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="36" height="42" viewBox="0 0 36 56" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="shadow" x="-10" y="-10" width="64" height="64">
               <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(20,184,166,0.5)"/>
             </filter>
           </defs>
           <path d="M18 54C18 54 32 36.5 32 22C32 11.5066 25.4934 4 18 4C10.5066 4 4 11.5066 4 22C4 36.5 18 54 18 54Z" fill="#14b8a6" stroke="#fff" stroke-width="3" filter="url(#shadow)"/>
-          <circle cx="18" cy="22" r="12" fill="#fff" stroke="#fff" stroke-width="1" />
+          <circle cx="18" cy="22" r="7" fill="#fff" stroke="#fff" stroke-width="1" />
         </svg>
       `;
       const marker = new mapboxgl.Marker({ element: el, offset: [0, -48] })
