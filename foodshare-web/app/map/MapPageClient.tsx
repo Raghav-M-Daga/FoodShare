@@ -239,9 +239,7 @@ export default function MapPageClient() {
       await addDoc(collection(db, 'pins'), pinData);
       setSelectedLocation(null);
       setPendingLocation(null);
-    } catch {
-      alert('Failed to add event. Please try again.');
-    }
+    } catch {}
   };
 
   const handleDeletePin = async (pinId: string, userId: string) => {
@@ -418,9 +416,7 @@ export default function MapPageClient() {
       setIsEditing(false);
       setEditingEvent(null);
       setSelectedLocation(null);
-    } catch {
-      alert('Failed to update event. Please try again.');
-    }
+    } catch {}
   };
 
   const handlePinDragEnd = async (eventId: string, lngLat: { lng: number; lat: number }) => {
@@ -437,9 +433,7 @@ export default function MapPageClient() {
         issue.id === eventId ? { ...issue, location: { lng: lngLat.lng, lat: lngLat.lat } } : issue
       ));
       setEditingEvent(prev => prev ? { ...prev, location: { lng: lngLat.lng, lat: lngLat.lat } } : prev);
-    } catch {
-      alert('Failed to update pin location.');
-    }
+    } catch {}
   };
 
   if (!isInitialized || authLoading) {
