@@ -201,7 +201,7 @@ export default function ReportForm({ location, onSubmit, onCancel, existingEvent
       <div className={styles.formGroup}>
         <label>Category</label>
         <div style={{ display: 'flex', gap: 15, padding: '10px 0px 0px 0px' }}>
-          {['mains', 'drinks', 'desserts'].map(cat => (
+          {['mains', 'desserts', 'drinks'].map(cat => (
             <button
               key={cat}
               type="button"
