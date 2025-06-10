@@ -132,7 +132,7 @@ export default function HomePage() {
             <div className={styles.logoWrapper}>
               <Image src="/tasty.png" alt="FoodShare" className={styles.logo} width={120} height={40} />
             </div>
-            <h1 className={styles.heroTitle}>{isRegistering ? 'Join FoodShare' : 'Welcome Back!'}</h1>
+            <h1 className={styles.heroTitle}>{'Join FoodShare'}</h1>
           </div>
         <motion.p
           initial={{ opacity: 0, y: 30 }}
