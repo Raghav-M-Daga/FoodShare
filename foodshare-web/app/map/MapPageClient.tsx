@@ -239,7 +239,7 @@ export default function MapPageClient() {
       await addDoc(collection(db, 'pins'), pinData);
       setSelectedLocation(null);
       setPendingLocation(null);
-    } catch (error) {
+    } catch {
       alert('Failed to add event. Please try again.');
     }
   };
@@ -249,7 +249,7 @@ export default function MapPageClient() {
     try {
       await deleteDoc(doc(db, 'pins', pinId));
       setIssues(prev => prev.filter(issue => issue.id !== pinId));
-    } catch (error) {}
+    } catch {}
   };
 
   const toggleBookmark = async (eventId: string, isBookmarked: boolean) => {
@@ -316,7 +316,7 @@ export default function MapPageClient() {
     ? applyFilters(sortedSidebarIssues.filter(isPastEvent))
     : applyFilters(sortedSidebarIssues.filter(isUpcomingEvent));
 
-  const filteredMapPins = useMemo(() => applyFilters(issues.filter(isUpcomingEvent)), [issues]);
+  const filteredMapPins = useMemo(() => applyFilters(issues.filter(isUpcomingEvent)), [issues, applyFilters]);
 
   const handleMapBackgroundClick = () => {
     if (!isEditing) {
@@ -418,7 +418,7 @@ export default function MapPageClient() {
       setIsEditing(false);
       setEditingEvent(null);
       setSelectedLocation(null);
-    } catch (error) {
+    } catch {
       alert('Failed to update event. Please try again.');
     }
   };
@@ -437,7 +437,7 @@ export default function MapPageClient() {
         issue.id === eventId ? { ...issue, location: { lng: lngLat.lng, lat: lngLat.lat } } : issue
       ));
       setEditingEvent(prev => prev ? { ...prev, location: { lng: lngLat.lng, lat: lngLat.lat } } : prev);
-    } catch (error) {
+    } catch {
       alert('Failed to update pin location.');
     }
   };
