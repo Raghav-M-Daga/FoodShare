@@ -133,7 +133,7 @@ export default function MapPageClient() {
       setIssues(updatedPins);
       setSidebarIssues(updatedPins);
       setIsLoading(false);
-    }, (error) => {
+    }, () => {
       setIsLoading(false);
     });
     return () => unsubscribe();
