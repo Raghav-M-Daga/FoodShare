@@ -44,6 +44,20 @@ const CAMPUSES: Record<string, Campus> = {
       lat: 36.00160553451508,
       lng: -78.93957298090419
     }
+  },
+  'american-high': {
+    id: 'american-high',
+    name: 'American High School',
+    bounds: {
+      north: 37.5670,
+      south: 37.5600,
+      east: -121.9900,
+      west: -122.05000
+    },
+    center: {
+      lat: 37.5654,
+      lng: -122.0165
+    }
   }
 };
 

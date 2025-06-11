@@ -39,6 +39,21 @@ const AVAILABLE_CAMPUSES: Campus[] = [
       lat: 36.00160553451508,
       lng: -78.93957298090419
     }
+  },
+  {
+    id: 'american-high',
+    name: 'American High School',
+    description: 'American High School is a public high school in Fremont, California.',
+    bounds: {
+      north: 37.5500,
+      south: 37.5400,
+      east: -121.9800,
+      west: -122.0000
+    },
+    center: {
+      lat: 37.5450,
+      lng: -121.9900
+    }
   }
 ];
 
